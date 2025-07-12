@@ -1,0 +1,17 @@
+CHRIST ID Card Verification Report
+Date/Time: 08-Mar-2025 09:00:38
+
+RESULT: APPROVED
+Location: Header region
+Detection Method: Dark Mask
+Confidence: 2.94%
+Extracted Text: i¢y:CHRIST
+
+
+
+FOOTER TEXT EXTRACTION:
+Method: Adaptive Binary
+Confidence: 95.00%
+Text:  
+
+

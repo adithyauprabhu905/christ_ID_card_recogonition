@@ -1,0 +1,65 @@
+clc; clear; close all;
+
+% Step 1: Read the Image
+img = imread('im'); % Ensure the correct filename
+
+% Create figure for subplots
+figure;
+
+% Display Original Image
+subplot(2,3,1);
+imshow(img);
+title('Original ID Card');
+
+% Step 2: Convert to Grayscale
+gray_img = rgb2gray(img);
+
+% Step 3: Apply Histogram Equalization for Contrast Enhancement
+hist_eq_img = histeq(gray_img);
+subplot(2,3,2);
+imshow(hist_eq_img);
+title('Histogram Equalized Image');
+
+% Step 4: Noise Reduction using Median Filtering
+filtered_img = medfilt2(hist_eq_img, [3 3]);
+
+% Step 5: Morphological Operations for Refinement
+se = strel('disk', 1);
+morph_img = imdilate(filtered_img, se);
+morph_img = imerode(morph_img, se);
+
+% Step 6: Edge Detection for Text Enhancement
+edge_img = edge(morph_img, 'Canny');
+
+% Step 7: Binarization using Adaptive Thresholding
+binary_img = imbinarize(morph_img, 'adaptive', 'Sensitivity', 0.35);
+subplot(2,3,3);
+imshow(binary_img);
+title('Binarized Image');
+
+% Step 8: Perform OCR with Optimized Parameters (Removed 'TextLayout')
+ocrResult = ocr(binary_img, 'CharacterSet', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 /-');
+
+% Extracted text
+recognized_text = strtrim(ocrResult.Text);
+
+% Step 9: Display Extracted Text in Console
+disp('Extracted Text:');
+disp(recognized_text);
+
+% Step 10: Display Extracted Text in Subplot
+subplot(2,3,4);
+if ~isempty(recognized_text)
+    text(0.1, 0.5, recognized_text, 'FontSize', 10, 'Interpreter', 'none', 'FontWeight', 'bold');
+else
+    text(0.1, 0.5, 'No Text Detected', 'FontSize', 10, 'FontWeight', 'bold', 'Color', 'red');
+end
+axis off;
+title('Extracted Text');
+
+% Step 11: Save the Extracted Text to a File
+fileID = fopen('recognized_text.txt', 'w');
+fprintf(fileID, '%s\n', recognized_text);
+fclose(fileID);
+
+disp('ID Card Text Recognition Completed with Enhanced Preprocessing.');
